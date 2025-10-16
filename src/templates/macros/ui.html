@@ -1,0 +1,13 @@
+{% macro scope_status(status = 'PENDING') %}
+<span>
+    {% if status == "PENDING" %}
+    <i class="bi bi-stopwatch text-warning"></i>
+    {% elif status == "ARCHIVED" %}
+    <i class="bi bi-archive text-success"></i>
+    {% elif status == "VOID" %}
+    <i class="bi bi-inbox text-danger"></i>
+    {% elif status == "INCOMPLETE" %}
+    <i class="bi bi-arrow-repeat text-info"></i>
+    {% endif %}
+</span>
+{% endmacro %}

@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Index{% endblock %}
+{% block content %}
+
+{% import 'macros/ui.html' as ui %}
+
+<div class="my-4">
+    <h1>{{ monitor.name }} ({{ scopes_count }} scopes)</h1>
+    <small class="text-muted">
+        Last scanned: {{ monitor.last_scan_at.strftime('%d.%m.%Y %H:%M:%S') }}
+    </small>
+    <br/>
+    <b>Status: </b>
+    {% for status in statuses %}
+    <span class="me-3">
+        {{ ui.scope_status(status.status) }} {{ status.scopes_count }}
+    </span>
+    {% endfor %}
+    <span>
+        <b>Total Duration: </b>
+        ~ {{ "%.2f"|format(files_count/600/60) }} hours
+    </span>
+</div>
+
+
+<table class="table table-bordered">
+    <thead>
+    <tr>
+        <th></th>
+        <th>Scope Name</th>
+        <th>Duration</th>
+        <th>Output</th>
+    </tr>
+    </thead>
+    <tbody>
+
+    {% for scope in scopes %}
+    <tr>
+        <td class="text-center">
+            {{ ui.scope_status(scope.status) }}
+        </td>
+        <td>
+            {{ scope.value }}
+        </td>
+        <td>
+            {% if scope.status == "ARCHIVED" %}
+            {{ scope.files_count/10 }} s
+            {% else %}
+            <span class="text-muted">
+
+            {{ scope.files_count }} files
+            </span>
+            {% endif %}
+        </td>
+        <td>
+            {% if scope.output %}
+            <a href="/scope/{{ scope.id }}/output">
+                {{ scope.output }}
+            </a>
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<div class="text-center">
+    <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
+            <li class="page-item"><a class="page-link"
+                                     href="/monitor/{{ monitor.id }}/{{ page_number - 1 }}">Previous</a></li>
+            {% for i in range(page_number - 3, page_number + 3) %}
+            {% if i > 0 and i <= num_pages %}
+            <li class="page-item {% if page_number == i %}active{%endif%}"><a class="page-link"
+                                                                              href="/monitor/{{ monitor.id }}/{{ i }}">{{i}}</a>
+            </li>
+            {% endif %}
+            {% endfor %}
+            <li class="page-item"><a class="page-link" href="/monitor/{{ monitor.id }}/{{ page_number + 1 }}">Next</a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+{% endblock %}

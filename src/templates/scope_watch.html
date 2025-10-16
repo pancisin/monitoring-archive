@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Index{% endblock %}
+{% block content %}
+<h1>Scope Watch</h1>
+
+<video class="object-fit-contain" id="player" playsinline controls data-poster="/path/to/poster.jpg">
+    <source src="{{ video_url }}" type="video/mp4"/>
+</video>
+{% endblock %}

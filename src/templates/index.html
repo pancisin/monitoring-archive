@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Index{% endblock %}
+{% block content %}
+<div class="my-4">
+    <h1>Monitors</h1>
+</div>
+
+<div class="list-group">
+    {% for monitor in monitors %}
+    <a class="list-group-item list-group-item-action" href="/monitor/{{ monitor.id }}/1">
+        {{ monitor.name }}
+    </a>
+    {% endfor %}
+</div>
+
+{% endblock %}
