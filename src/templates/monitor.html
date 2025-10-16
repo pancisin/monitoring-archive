@@ -54,7 +54,7 @@
         </td>
         <td>
             {% if scope.output %}
-            <a href="/scope/{{ scope.id }}/output">
+            <a href="/monitor/{{ monitor.name }}/scope/{{ scope.value }}">
                 {{ scope.output }}
             </a>
             {% endif %}
@@ -68,15 +68,15 @@
     <nav aria-label="Page navigation example">
         <ul class="pagination justify-content-center">
             <li class="page-item"><a class="page-link"
-                                     href="/monitor/{{ monitor.id }}/{{ page_number - 1 }}">Previous</a></li>
+                                     href="/monitor/{{ monitor.name }}/{{ page_number - 1 }}">Previous</a></li>
             {% for i in range(page_number - 3, page_number + 3) %}
             {% if i > 0 and i <= num_pages %}
             <li class="page-item {% if page_number == i %}active{%endif%}"><a class="page-link"
-                                                                              href="/monitor/{{ monitor.id }}/{{ i }}">{{i}}</a>
+                                                                              href="/monitor/{{ monitor.name }}/{{ i }}">{{i}}</a>
             </li>
             {% endif %}
             {% endfor %}
-            <li class="page-item"><a class="page-link" href="/monitor/{{ monitor.id }}/{{ page_number + 1 }}">Next</a>
+            <li class="page-item"><a class="page-link" href="/monitor/{{ monitor.name }}/{{ page_number + 1 }}">Next</a>
             </li>
         </ul>
     </nav>

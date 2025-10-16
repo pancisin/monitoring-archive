@@ -34,10 +34,11 @@ def home():
     return render_template('index.html', monitors=monitors)
 
 
-@app.route("/monitor/<int:monitor_id>/<int:page_number>")
+@app.route("/monitor/<monitor_name>/<int:page_number>")
 @cache.cached(timeout=60 * 2)
-def monitor(monitor_id, page_number=1):
-    monitor = Monitor.get(monitor_id)
+def monitor(monitor_name, page_number=1):
+    monitor = Monitor.get(Monitor.name == monitor_name)
+    monitor_id = monitor.id
     page_size = 15
 
     scopes_count = MonitoringScope.select().where(MonitoringScope.monitor == monitor_id).count()
@@ -74,10 +75,11 @@ def monitor(monitor_id, page_number=1):
     )
 
 
-@app.route("/scope/<int:scope_id>/output")
+@app.route("/monitor/<monitor_name>/scope/<scope_value>")
 @cache.cached(timeout=60 * 2)
-def scope_watch(scope_id):
-    scope = MonitoringScope.get(id=scope_id)
+def scope_watch(monitor_name, scope_value):
+    monitor = Monitor.get(Monitor.name == monitor_name)
+    scope = MonitoringScope.get(MonitoringScope.value == scope_value, MonitoringScope.monitor == monitor.id)
     presigned_url = s3_client.meta.client.generate_presigned_url(
         'get_object',
         Params={'Bucket': "monitoring-storage", 'Key': scope.output},
@@ -85,7 +87,7 @@ def scope_watch(scope_id):
 
     )
 
-    return render_template('scope_watch.html', video_url=presigned_url, scope=scope)
+    return render_template('scope.html', video_url=presigned_url, scope=scope)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Index{% endblock %}
+{% block content %}
+
+<div class="row my-4">
+    <div class="col-xl-4">
+        <div class="mb-4">
+            <h1>Scope {{ scope.value }}</h1>
+            <small class="text-muted">
+                {{ scope.starts_at.strftime('%d.%m.%Y %H:%M:%S') }}
+                <span> - </span>
+                {{ scope.ends_at.strftime('%d.%m.%Y %H:%M:%S') }}
+            </small>
+            <br/>
+            <span>
+                <b>File Name: </b>
+                {{ scope.output }}
+            </span>
+        </div>
+
+        <div class="list-group">
+            <a class="list-group-item list-group-item-action" href="#">
+                Back
+            </a>
+            <a class="list-group-item list-group-item-action" href="#">
+                Download Video
+            </a>
+            <a class="list-group-item list-group-item-action" href="#">
+                Rebuild
+            </a>
+            <a class="list-group-item list-group-item-action" href="#">
+                Delete
+            </a>
+        </div>
+
+    </div>
+    <div class="col-xl-8">
+        <div class="plyr__video-embed">
+            <video id="player" playsinline controls>
+                <source src="{{ video_url }}" type="video/mp4"/>
+            </video>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/player.js') }}"></script>
+{% endblock %}
