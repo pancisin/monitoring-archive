@@ -27,15 +27,6 @@
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="/">Home</a>
                     </li>
-<!--                    <li class="nav-item">-->
-<!--                        <a class="nav-link" href="#">Features</a>-->
-<!--                    </li>-->
-<!--                    <li class="nav-item">-->
-<!--                        <a class="nav-link" href="#">Pricing</a>-->
-<!--                    </li>-->
-<!--                    <li class="nav-item">-->
-<!--                        <a class="nav-link disabled" aria-disabled="true">Disabled</a>-->
-<!--                    </li>-->
                 </ul>
             </div>
         </div>
@@ -48,7 +39,7 @@
 <div id="footer">
     <div class="container">
         {% block footer %}
-<!--        &copy; Copyright 2008 by <a href="http://domain.invalid/">you</a>.-->
+        <!--        &copy; Copyright 2008 by <a href="http://domain.invalid/">you</a>.-->
         {% endblock %}
     </div>
 </div>
@@ -57,5 +48,7 @@
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
         crossorigin="anonymous"></script>
 <script src="https://cdn.plyr.io/3.8.3/plyr.polyfilled.js"></script>
+{% block scripts %}
+{% endblock %}
 </body>
 </html>

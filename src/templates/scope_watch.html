@@ -1,9 +1,31 @@
 {% extends "base.html" %}
 {% block title %}Index{% endblock %}
 {% block content %}
-<h1>Scope Watch</h1>
+<div class="my-4">
+    <h1>Scope {{ scope.value }}</h1>
+    <small class="text-muted">
+        {{ scope.starts_at.strftime('%d.%m.%Y %H:%M:%S') }}
+        <span> - </span>
+        {{ scope.ends_at.strftime('%d.%m.%Y %H:%M:%S') }}
+    </small>
+    <br />
+    <span>
+        <b>File Name: </b>
+        {{ scope.output }}
+    </span>
+</div>
 
-<video class="object-fit-contain" id="player" playsinline controls data-poster="/path/to/poster.jpg">
-    <source src="{{ video_url }}" type="video/mp4"/>
-</video>
+<div class="row">
+    <div class="col-lg-6 offset-lg-3 col-xl-8 offset-xl-2">
+        <div class="plyr__video-embed">
+            <video id="player" playsinline controls>
+                <source src="{{ video_url }}" type="video/mp4"/>
+            </video>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/player.js') }}"></script>
 {% endblock %}

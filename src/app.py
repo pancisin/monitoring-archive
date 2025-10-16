@@ -8,7 +8,7 @@ from flask_caching import Cache
 from src.models import Monitor, MonitoringScope
 from peewee import fn
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static', template_folder='templates')
 
 app.config['CACHE_TYPE'] = 'SimpleCache'  # Use a simple in-memory cache
 app.config['CACHE_DEFAULT_TIMEOUT'] = 300  # Cache timeout in seconds
@@ -85,7 +85,7 @@ def scope_watch(scope_id):
 
     )
 
-    return render_template('scope_watch.html', video_url=presigned_url)
+    return render_template('scope_watch.html', video_url=presigned_url, scope=scope)
 
 
 if __name__ == "__main__":
