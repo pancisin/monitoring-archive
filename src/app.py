@@ -2,7 +2,7 @@ import os
 import boto3
 
 from botocore.config import Config
-from flask import Flask, render_template
+from flask import Flask, render_template, request, jsonify
 from flask_caching import Cache
 
 from src.models import Monitor, MonitoringScope
@@ -27,6 +27,59 @@ s3_client = boto3.resource(
 bucket = s3_client.Bucket('monitoring-storage')
 
 
+@app.route("/api/v1/monitors")
+def get_monitors():
+    monitors = Monitor.select()
+    data = [monitor.__data__ for monitor in monitors]
+    return jsonify(data)
+
+
+def get_scopes(monitor_id: id, unit: str = None, page_number: int = 1, page_size: int = 15):
+    request_filter = (MonitoringScope.monitor == monitor_id,) if unit is None or not unit.strip() else (
+        MonitoringScope.monitor == monitor_id, MonitoringScope.unit == unit)
+
+    scopes_count = MonitoringScope.select().where(request_filter).count()
+
+    scopes = (MonitoringScope
+              .select()
+              .where(*request_filter)
+              .order_by(MonitoringScope.ends_at.desc())
+              .paginate(page_number, page_size)
+              )
+
+    return scopes, scopes_count
+
+
+@app.route("/api/v1/monitors/<monitor_name>/scopes")
+def get_monitor_scopes(monitor_name):
+    monitor = Monitor.get(Monitor.name == monitor_name)
+    scopes, _ = get_scopes(monitor.id)
+    data = [scope.__data__ for scope in scopes]
+    return jsonify(data)
+
+
+def get_video_url(file_name: str, expires_in: int = 60 * 5):
+    return s3_client.meta.client.generate_presigned_url(
+        'get_object',
+        Params={'Bucket': "monitoring-storage", 'Key': file_name},
+        ExpiresIn=expires_in,
+    )
+
+
+@app.route("/api/v1/monitors/<monitor_name>/scope/<scope_value>/output")
+def get_scope_video_url(monitor_name, scope_value):
+    monitor = Monitor.get(Monitor.name == monitor_name)
+    scope = MonitoringScope.get(MonitoringScope.value == scope_value, MonitoringScope.monitor == monitor.id)
+    expires_int = 60 * 5
+    video_url = get_video_url(scope.output, expires_int)
+
+    data = {
+        "video_url": video_url,
+        "expires_in": expires_int,
+    }
+    return jsonify(data)
+
+
 @app.route("/")
 @cache.cached(timeout=60 * 60 * 2)
 def home():
@@ -34,21 +87,20 @@ def home():
     return render_template('index.html', monitors=monitors)
 
 
+def get_monitor_cache_key():
+    unit = request.args.get('unit')
+    return request.path if unit is None else request.path + "/" + unit
+
+
 @app.route("/monitor/<monitor_name>/<int:page_number>")
-@cache.cached(timeout=60 * 2)
+@cache.cached(timeout=60 * 2, key_prefix=get_monitor_cache_key)
 def monitor(monitor_name, page_number=1):
     monitor = Monitor.get(Monitor.name == monitor_name)
     monitor_id = monitor.id
     page_size = 15
+    unit = request.args.get('unit')
 
-    scopes_count = MonitoringScope.select().where(MonitoringScope.monitor == monitor_id).count()
-
-    scopes = (MonitoringScope
-              .select()
-              .where(MonitoringScope.monitor == monitor_id)
-              .order_by(MonitoringScope.ends_at.desc())
-              .paginate(page_number, page_size)
-              )
+    scopes, scopes_count = get_scopes(monitor_id, unit, page_number, page_size)
 
     num_pages = int(scopes_count / page_size)
 
@@ -72,6 +124,7 @@ def monitor(monitor_name, page_number=1):
         page_number=page_number,
         statuses=monitor_scopes_status,
         files_count=files_count,
+        unit=unit
     )
 
 
@@ -80,14 +133,9 @@ def monitor(monitor_name, page_number=1):
 def scope_watch(monitor_name, scope_value):
     monitor = Monitor.get(Monitor.name == monitor_name)
     scope = MonitoringScope.get(MonitoringScope.value == scope_value, MonitoringScope.monitor == monitor.id)
-    presigned_url = s3_client.meta.client.generate_presigned_url(
-        'get_object',
-        Params={'Bucket': "monitoring-storage", 'Key': scope.output},
-        ExpiresIn=60 * 5,
+    video_url = get_video_url(scope.output)
 
-    )
-
-    return render_template('scope.html', video_url=presigned_url, scope=scope)
+    return render_template('scope.html', video_url=video_url, scope=scope)
 
 
 if __name__ == "__main__":

@@ -22,6 +22,16 @@
     </span>
 </div>
 
+<div class="text-end">
+    <div class="btn-group mb-4" role="group" aria-label="Basic example">
+        <a class="btn btn-outline-primary {% if unit is none or unit == '' %}active{%endif%}"
+           href="/monitor/{{ monitor.name }}/1">All</a>
+        <a class="btn btn-outline-primary {% if unit == 'DAY' %}active{%endif%}"
+           href="/monitor/{{ monitor.name }}/1?unit=DAY">Days</a>
+        <a class="btn btn-outline-primary {% if unit == 'MONTH' %}active{%endif%}"
+           href="/monitor/{{ monitor.name }}/1?unit=MONTH">Months</a>
+    </div>
+</div>
 
 <table class="table table-bordered">
     <thead>
@@ -68,15 +78,17 @@
     <nav aria-label="Page navigation example">
         <ul class="pagination justify-content-center">
             <li class="page-item"><a class="page-link"
-                                     href="/monitor/{{ monitor.name }}/{{ page_number - 1 }}">Previous</a></li>
+                                     href="/monitor/{{ monitor.name }}/{{ page_number - 1 }}?unit={{ unit or '' }}">Previous</a>
+            </li>
             {% for i in range(page_number - 3, page_number + 3) %}
             {% if i > 0 and i <= num_pages %}
             <li class="page-item {% if page_number == i %}active{%endif%}"><a class="page-link"
-                                                                              href="/monitor/{{ monitor.name }}/{{ i }}">{{i}}</a>
+                                                                              href="/monitor/{{ monitor.name }}/{{ i }}?unit={{ unit or '' }}">{{i}}</a>
             </li>
             {% endif %}
             {% endfor %}
-            <li class="page-item"><a class="page-link" href="/monitor/{{ monitor.name }}/{{ page_number + 1 }}">Next</a>
+            <li class="page-item"><a class="page-link"
+                                     href="/monitor/{{ monitor.name }}/{{ page_number + 1 }}?unit={{ unit or '' }}">Next</a>
             </li>
         </ul>
     </nav>
