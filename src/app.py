@@ -38,7 +38,7 @@ def get_scopes(monitor_id: id, unit: str = None, page_number: int = 1, page_size
     request_filter = (MonitoringScope.monitor == monitor_id,) if unit is None or not unit.strip() else (
         MonitoringScope.monitor == monitor_id, MonitoringScope.unit == unit)
 
-    scopes_count = MonitoringScope.select().where(request_filter).count()
+    scopes_count = MonitoringScope.select().where(*request_filter).count()
 
     scopes = (MonitoringScope
               .select()
