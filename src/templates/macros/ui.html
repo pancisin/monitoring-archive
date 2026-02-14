@@ -8,6 +8,8 @@
     <i class="bi bi-inbox text-danger"></i>
     {% elif status == "INCOMPLETE" %}
     <i class="bi bi-arrow-repeat text-info"></i>
+    {% elif status == "DELETED_ARCHIVED" %}
+    <i class="bi bi-archive text-muted"></i>
     {% endif %}
 </span>
 {% endmacro %}

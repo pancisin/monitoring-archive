@@ -1,10 +1,9 @@
 const createControl =  (label, handler) => {
     const button = document.createElement('button');
-    button.className = 'plyr__control';
+    button.className = 'plyr__control user-select-none';
     button.innerHTML = label;
     button.title = label;
     button.onclick = handler;
-    button.class = "user-select-none"
 
     return button;
 }

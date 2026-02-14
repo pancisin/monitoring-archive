@@ -24,6 +24,7 @@ class Monitor(BaseModel):
     last_scan_at = DateTimeField(null=True)
     width = IntegerField(null=True)
     height = IntegerField(null=True)
+    identifier = CharField(null=True)
 
     # def __init__(self, name: str, *args, **kwargs):
     #     super().__init__(*args, **kwargs)

@@ -7,6 +7,7 @@ from flask_caching import Cache
 
 from src.models import Monitor, MonitoringScope
 from peewee import fn
+from typing import Dict, List
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
 
@@ -27,14 +28,28 @@ s3_client = boto3.resource(
 bucket = s3_client.Bucket('monitoring-storage')
 
 
+def get_monitor_thumb(monitor_id: str) -> str:
+    shinobi_host = "shinobi.home"
+    shinobi_key = "kFZ0nGq478IEkJO1CQL5g4913fys8o"
+    shinobi_endpoint = f"http://{shinobi_host}/{shinobi_key}"
+
+    monitor_group_id = "0ZOGYRpKx2"
+    return f"{shinobi_endpoint}/jpeg/{monitor_group_id}/{monitor_id}/s.jpg"
+
+
 @app.route("/api/v1/monitors")
 def get_monitors():
     monitors = Monitor.select()
-    data = [monitor.__data__ for monitor in monitors]
+    data: List[Dict] = [monitor.__data__ for monitor in monitors]
+
+    for mon in data:
+        thumbnail = get_monitor_thumb(mon['identifier'])
+        mon['thumbnail'] = thumbnail
+
     return jsonify(data)
 
 
-def get_scopes(monitor_id: id, unit: str = None, page_number: int = 1, page_size: int = 15):
+def get_scopes(monitor_id: id, unit: str = "MONTH", page_number: int = 1, page_size: int = 15):
     request_filter = (MonitoringScope.monitor == monitor_id,) if unit is None or not unit.strip() else (
         MonitoringScope.monitor == monitor_id, MonitoringScope.unit == unit)
 
@@ -53,7 +68,7 @@ def get_scopes(monitor_id: id, unit: str = None, page_number: int = 1, page_size
 @app.route("/api/v1/monitors/<monitor_name>/scopes")
 def get_monitor_scopes(monitor_name):
     monitor = Monitor.get(Monitor.name == monitor_name)
-    scopes, _ = get_scopes(monitor.id)
+    scopes, _ = get_scopes(monitor.id, page_size=50)
     data = [scope.__data__ for scope in scopes]
     return jsonify(data)
 
